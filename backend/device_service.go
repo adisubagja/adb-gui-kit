@@ -68,7 +68,7 @@ func (a *App) getIPAddress(serial string) string {
 }
 
 func (a *App) getRamTotal(serial string) string {
-	output, err := a.runAdbCommandWithSerial(serial, "shell", "cat /proc/meminfo | grep MemTotal")
+	output, err := a.runAdbCommandWithSerial(serial, "shell", "cat", "/proc/meminfo")
 	if err != nil {
 		return "N/A"
 	}
@@ -209,7 +209,7 @@ func (a *App) GetDeviceInfo() (DeviceInfo, error) {
 		if err != nil {
 			info.BatteryLevel = "N/A"
 		} else {
-			re := regexp.MustCompile(`:\s*(\d+)`)
+			re := regexp.MustCompile(`(?m)^\s*level:\s*(\d+)\s*$`)
 			matches := re.FindStringSubmatch(batteryOutput)
 			if len(matches) > 1 {
 				info.BatteryLevel = matches[1] + "%"
