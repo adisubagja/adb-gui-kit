@@ -128,7 +128,7 @@ export function MainLayout() {
           <div className={cn("relative flex h-screen bg-background text-foreground overflow-hidden", isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out")}>
             <AppSidebar navItems={NAV_ITEMS} activeView={activeView} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed((prev) => !prev)} onSelectView={(id) => setActiveView(id as ViewType)} />
 
-            <main className="flex-1 overflow-auto custom-scroll">
+            <main className="flex-1 overflow-auto custom-scroll perf-scroll">
               <div className="min-h-full p-6">
                 <AnimatePresence mode="wait">
                   <motion.div key={activeView} initial="hidden" animate="visible" exit="exit" variants={pageVariants} transition={{ duration: 0.2 }}>

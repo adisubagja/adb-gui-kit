@@ -62,7 +62,7 @@ export function CommandLogTable({ logs, onRefresh, isLoading }: CommandLogTableP
       <div className="rounded-md border flex-1 overflow-hidden flex flex-col bg-card">
         <ScrollArea className="flex-1">
           <Table>
-            <TableHeader className="sticky top-0 bg-muted/80 backdrop-blur z-10">
+            <TableHeader className="sticky top-0 bg-muted z-10">
               <TableRow>
                 <TableHead className="w-[100px]">Time</TableHead>
                 <TableHead className="w-[80px]">Mode</TableHead>
