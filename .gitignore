@@ -1,5 +1,11 @@
 build/bin
 build/windows/installer/tmp
+build/ADBKit.desktop
+build/nfpm.yaml
+build/AppDir/
+build/linuxdeploy-x86_64.AppImage
+build/test-appimage/
+build/verify-appimage/
 node_modules
 frontend/dist
 out/
