@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { EventsOn, EventsOff } from "../../../wailsjs/runtime/runtime";
+import { EventsOn } from "../../../wailsjs/runtime/runtime";
 import { StartLogcat, StopLogcat } from "../../../wailsjs/go/backend/App";
 import { LogcatTerminalCard } from "@/components/logcat/LogcatTerminalCard";
 import { toast } from "sonner";
@@ -62,9 +62,9 @@ export function ViewLogcat({ activeView }: { activeView: string }) {
     });
 
     return () => {
-      EventsOff("logcat_line");
-      EventsOff("logcat_error");
-      EventsOff("logcat_status");
+      stdoutCancel();
+      stderrCancel();
+      statusCancel();
       if (bufferTimer) {
         clearTimeout(bufferTimer);
         bufferTimer = null;
