@@ -182,6 +182,11 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   };
 
   const handleFlash = async () => {
+    if (!selectedFastbootSerial) {
+      toast.error("Select an active fastboot device before flashing.");
+      return;
+    }
+
     if (!partition) {
       toast.error("Partition name cannot be empty.");
       return;
@@ -206,6 +211,11 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   };
 
   const handleSideload = async () => {
+    if (!selectedFastbootSerial) {
+      toast.error("Select an active device before sideloading.");
+      return;
+    }
+
     if (!sideloadFilePath) {
       toast.error("No update package selected.");
       return;
@@ -228,6 +238,11 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   };
 
   const handleWipe = async () => {
+    if (!selectedFastbootSerial) {
+      toast.error("Select an active fastboot device before wiping data.");
+      return;
+    }
+
     setIsWiping(true);
     const toastId = toast.loading("Wiping data... Device will factory reset.");
 
@@ -322,6 +337,7 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
     activeSerial && fastbootDevices.some((device) => device.Serial === activeSerial)
       ? activeSerial
       : (fastbootDevices[0]?.Serial ?? "");
+  const canRunDestructiveActions = hasFastbootDevice && Boolean(selectedFastbootSerial);
 
   return (
     <div className="flex flex-col gap-6">
@@ -332,10 +348,10 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onRefreshSlot={handleRefreshSlot} 
         onSetSlot={handleSetSlot} 
         isChangingSlot={isChangingSlot} 
-        canManage={hasFastbootDevice} 
+        canManage={canRunDestructiveActions} 
       />
 
-      <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={hasFastbootDevice} />
+      <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={canRunDestructiveActions} />
 
       <FlashRomFolderCard 
         folderPath={romFolderPath}
@@ -345,7 +361,7 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onFlash={handleBatchFlash}
         isScanning={isScanningFolder}
         isFlashing={isBatchFlashing}
-        canFlash={hasFastbootDevice}
+        canFlash={canRunDestructiveActions}
       />
 
       <RecoveryActionsCard
@@ -355,7 +371,7 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onSideload={handleSideload}
         isWiping={isWiping}
         onWipe={handleWipe}
-        canWipe={hasFastbootDevice}
+        canWipe={canRunDestructiveActions}
         isRecoveryMode={hasSideloadDevice}
       />
     </div>
