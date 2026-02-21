@@ -10,8 +10,6 @@ export function ClearData(arg1:string):Promise<string>;
 
 export function ConnectWirelessAdb(arg1:string,arg2:string):Promise<string>;
 
-export function CreateBugreport(arg1:string,arg2:string):Promise<void>;
-
 export function CreateFolder(arg1:string):Promise<string>;
 
 export function DeleteFile(arg1:string):Promise<string>;

@@ -18,10 +18,6 @@ export function ConnectWirelessAdb(arg1, arg2) {
   return window['go']['backend']['App']['ConnectWirelessAdb'](arg1, arg2);
 }
 
-export function CreateBugreport(arg1, arg2) {
-  return window['go']['backend']['App']['CreateBugreport'](arg1, arg2);
-}
-
 export function CreateFolder(arg1) {
   return window['go']['backend']['App']['CreateFolder'](arg1);
 }
