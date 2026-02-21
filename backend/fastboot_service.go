@@ -95,9 +95,55 @@ func (a *App) FlashRomFolder(serial string, folderPath string, plan FlashPlan) e
 }
 
 func (a *App) GetFastbootSlot(serial string) (string, error) {
-	return "a", nil
+	if serial == "" {
+		return "", fmt.Errorf("serial cannot be empty")
+	}
+
+	output, err := a.runCommand("fastboot", "-s", serial, "getvar", "current-slot")
+	if err != nil {
+		return "", fmt.Errorf("failed to get current slot: %w. Output: %s", err, output)
+	}
+
+	// fastboot getvar current-slot output typically looks like:
+	// current-slot: a
+	// Finished. Total time: 0.002s
+	lines := strings.Split(output, "\n")
+	for _, line := range lines {
+		if strings.HasPrefix(line, "current-slot:") {
+			parts := strings.Split(line, ":")
+			if len(parts) == 2 {
+				slot := strings.TrimSpace(parts[1])
+				// Valid slots are usually 'a' or 'b', sometimes '' if not A/B
+				if slot == "a" || slot == "b" {
+					return slot, nil
+				}
+				if slot == "" {
+					return "", fmt.Errorf("device does not seem to support A/B slots")
+				}
+				return slot, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("could not parse slot from fastboot output: %s", output)
 }
 
 func (a *App) SetFastbootSlot(serial string, slot string) error {
+	if serial == "" || slot == "" {
+		return fmt.Errorf("serial and slot cannot be empty")
+	}
+
+	slotLower := strings.ToLower(strings.TrimSpace(slot))
+	if slotLower != "a" && slotLower != "b" {
+		return fmt.Errorf("invalid slot: '%s'. only 'a' or 'b' allowed", slot)
+	}
+
+	a.logCommand("fastboot", []string{"-s", serial, "set_active", slotLower}, 0, nil, fmt.Sprintf("Setting active slot to %s", slotLower))
+
+	output, err := a.runCommand("fastboot", "-s", serial, "set_active", slotLower)
+	if err != nil {
+		return fmt.Errorf("failed to set active slot: %w. Output: %s", err, output)
+	}
+
 	return nil
 }

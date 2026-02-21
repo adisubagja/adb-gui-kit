@@ -7,6 +7,7 @@ import { FastbootDevicesCard } from "@/components/flasher/FastbootDevicesCard";
 import { FlashPartitionCard } from "@/components/flasher/FlashPartitionCard";
 import { RecoveryActionsCard } from "@/components/flasher/RecoveryActionsCard";
 import { FlashRomFolderCard } from "@/components/flasher/FlashRomFolderCard";
+import { SlotManagerCard } from "@/components/flasher/SlotManagerCard";
 
 type Device = backend.Device;
 
@@ -50,6 +51,10 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   const [flashPlan, setFlashPlan] = useState<backend.FlashPlan | null>(null);
   const [isScanningFolder, setIsScanningFolder] = useState(false);
   const [isBatchFlashing, setIsBatchFlashing] = useState(false);
+
+  // A/B Slot states
+  const [currentSlot, setCurrentSlot] = useState<string | null>(null);
+  const [isChangingSlot, setIsChangingSlot] = useState(false);
 
   const [fastbootDevices, setFastbootDevices] = useState<Device[]>([]);
   const [isRefreshingFastboot, setIsRefreshingFastboot] = useState(false);
@@ -278,9 +283,50 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
     }
   };
 
+  const handleRefreshSlot = async () => {
+    if (fastbootDevices.length === 0) return;
+    setIsChangingSlot(true);
+    try {
+      const serial = fastbootDevices[0].Serial;
+      const slot = await GetFastbootSlot(serial);
+      setCurrentSlot(slot);
+    } catch (error) {
+      console.error("Failed to get slot", error);
+      toast.error("Slot Detection Failed", { description: String(error) });
+      setCurrentSlot(null);
+    } finally {
+      setIsChangingSlot(false);
+    }
+  };
+
+  const handleSetSlot = async (slot: string) => {
+    if (fastbootDevices.length === 0) return;
+    setIsChangingSlot(true);
+    const toastId = toast.loading(`Setting active slot to ${slot}...`);
+    try {
+      const serial = fastbootDevices[0].Serial;
+      await SetFastbootSlot(serial, slot);
+      setCurrentSlot(slot);
+      toast.success("Slot Changed", { description: `Active slot set to ${slot}`, id: toastId });
+    } catch (error) {
+      console.error("Failed to set slot", error);
+      toast.error("Slot Change Failed", { description: String(error), id: toastId });
+    } finally {
+      setIsChangingSlot(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <FastbootDevicesCard devices={fastbootDevices} isRefreshing={isRefreshingFastboot} error={fastbootError} onRefresh={() => refreshFastbootDevices()} />
+
+      <SlotManagerCard 
+        currentSlot={currentSlot} 
+        onRefreshSlot={handleRefreshSlot} 
+        onSetSlot={handleSetSlot} 
+        isChangingSlot={isChangingSlot} 
+        canManage={fastbootDevices.length > 0} 
+      />
 
       <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={fastbootDevices.length > 0} />
 
