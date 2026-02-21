@@ -78,6 +78,19 @@ func (a *App) RunFastbootHostCommand(args string) (string, error) {
 }
 
 func (a *App) FlashRomFolder(serial string, folderPath string, plan FlashPlan) error {
+	if folderPath == "" || len(plan.Steps) == 0 {
+		return fmt.Errorf("invalid flash plan or empty folder path")
+	}
+
+	for i, step := range plan.Steps {
+		a.logCommand("fastboot", []string{"-s", serial, "flash", step.Partition, step.ImageFile}, 0, nil, fmt.Sprintf("Starting step %d: Flashing %s", i+1, step.Partition))
+
+		err := a.FlashPartition(step.Partition, step.ImageFile)
+		if err != nil {
+			return fmt.Errorf("failed at step %d (partition %s): %w", i+1, step.Partition, err)
+		}
+	}
+
 	return nil
 }
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { WipeData, FlashPartition, SelectImageFile, GetFastbootDevices, SelectZipFile, SideloadPackage, FlashRomFolder, GetFastbootSlot, SetFastbootSlot } from "../../../wailsjs/go/backend/App";
+import { WipeData, FlashPartition, SelectImageFile, GetFastbootDevices, SelectZipFile, SideloadPackage, FlashRomFolder, GetFastbootSlot, SetFastbootSlot, ScanRomFolder } from "../../../wailsjs/go/backend/App";
 import { backend } from "../../../wailsjs/go/models";
 
 import { toast } from "sonner";
 import { FastbootDevicesCard } from "@/components/flasher/FastbootDevicesCard";
 import { FlashPartitionCard } from "@/components/flasher/FlashPartitionCard";
 import { RecoveryActionsCard } from "@/components/flasher/RecoveryActionsCard";
+import { FlashRomFolderCard } from "@/components/flasher/FlashRomFolderCard";
 
 type Device = backend.Device;
 
@@ -43,6 +44,12 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   const [isFlashing, setIsFlashing] = useState(false);
   const [isWiping, setIsWiping] = useState(false);
   const [isSideloading, setIsSideloading] = useState(false);
+
+  // Batch Flasher states
+  const [romFolderPath, setRomFolderPath] = useState("");
+  const [flashPlan, setFlashPlan] = useState<backend.FlashPlan | null>(null);
+  const [isScanningFolder, setIsScanningFolder] = useState(false);
+  const [isBatchFlashing, setIsBatchFlashing] = useState(false);
 
   const [fastbootDevices, setFastbootDevices] = useState<Device[]>([]);
   const [isRefreshingFastboot, setIsRefreshingFastboot] = useState(false);
@@ -228,11 +235,65 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
     }
   };
 
+  const handleSelectRomFolder = async (path?: string) => {
+    if (path !== undefined) {
+      setRomFolderPath(path);
+    }
+  };
+
+  const handleScanRomFolder = async () => {
+    if (!romFolderPath) return;
+    setIsScanningFolder(true);
+    try {
+      const plan = await ScanRomFolder(romFolderPath);
+      setFlashPlan(plan);
+      toast.success(`Scanned successfully. Found ${plan.steps?.length || 0} images to flash.`);
+    } catch (error) {
+      toast.error("Scan Failed", { description: String(error) });
+      setFlashPlan(null);
+    } finally {
+      setIsScanningFolder(false);
+    }
+  };
+
+  const handleBatchFlash = async () => {
+    if (!flashPlan || !flashPlan.steps || flashPlan.steps.length === 0) return;
+    if (fastbootDevices.length === 0) {
+      toast.error("No fastboot device connected.");
+      return;
+    }
+
+    setIsBatchFlashing(true);
+    const serial = fastbootDevices[0].Serial;
+    const toastId = toast.loading(`Starting batch flash sequence (${flashPlan.steps.length} partitions)...`);
+
+    try {
+      await FlashRomFolder(serial, romFolderPath, flashPlan);
+      toast.success("Batch Flash Complete", { description: "All partitions flashed successfully.", id: toastId });
+    } catch (error) {
+      console.error("Batch flash error:", error);
+      toast.error("Batch Flash Failed", { description: String(error), id: toastId });
+    } finally {
+      setIsBatchFlashing(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <FastbootDevicesCard devices={fastbootDevices} isRefreshing={isRefreshingFastboot} error={fastbootError} onRefresh={() => refreshFastbootDevices()} />
 
       <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={fastbootDevices.length > 0} />
+
+      <FlashRomFolderCard 
+        folderPath={romFolderPath}
+        plan={flashPlan}
+        onSelectFolder={handleSelectRomFolder}
+        onScanFolder={handleScanRomFolder}
+        onFlash={handleBatchFlash}
+        isScanning={isScanningFolder}
+        isFlashing={isBatchFlashing}
+        canFlash={fastbootDevices.length > 0}
+      />
 
       <RecoveryActionsCard
         sideloadFilePath={sideloadFilePath}

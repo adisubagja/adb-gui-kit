@@ -74,6 +74,8 @@ export function RunFastbootHostCommand(arg1:string):Promise<string>;
 
 export function RunShellCommand(arg1:string):Promise<string>;
 
+export function ScanRomFolder(arg1:string):Promise<backend.FlashPlan>;
+
 export function SelectApkFile():Promise<string>;
 
 export function SelectDirectoryForPull():Promise<string>;
