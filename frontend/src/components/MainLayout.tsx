@@ -21,6 +21,8 @@ import { ViewShell } from "./views/ViewShell";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { LoadingOverlay } from "@/components/layout/LoadingOverlay";
 
+import { DeviceProvider } from "@/lib/deviceContext";
+
 const VIEWS = {
   DASHBOARD: "dashboard",
   APPS: "apps",
@@ -115,23 +117,25 @@ export function MainLayout() {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <TooltipProvider delayDuration={0}>
-        <LoadingOverlay isLoading={isLoading} progress={progress} />
-        <div className={cn("relative flex h-screen bg-background text-foreground overflow-hidden", isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out")}>
-          <AppSidebar navItems={NAV_ITEMS} activeView={activeView} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed((prev) => !prev)} onSelectView={(id) => setActiveView(id as ViewType)} />
+      <DeviceProvider>
+        <TooltipProvider delayDuration={0}>
+          <LoadingOverlay isLoading={isLoading} progress={progress} />
+          <div className={cn("relative flex h-screen bg-background text-foreground overflow-hidden", isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out")}>
+            <AppSidebar navItems={NAV_ITEMS} activeView={activeView} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed((prev) => !prev)} onSelectView={(id) => setActiveView(id as ViewType)} />
 
-          <main className="flex-1 overflow-auto custom-scroll">
-            <div className="min-h-full p-6">
-              <AnimatePresence mode="wait">
-                <motion.div key={activeView} initial="hidden" animate="visible" exit="exit" variants={pageVariants} transition={{ duration: 0.2 }}>
-                  {renderActiveView()}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </main>
-        </div>
-        <Toaster position="top-right" richColors closeButton />
-      </TooltipProvider>
+            <main className="flex-1 overflow-auto custom-scroll">
+              <div className="min-h-full p-6">
+                <AnimatePresence mode="wait">
+                  <motion.div key={activeView} initial="hidden" animate="visible" exit="exit" variants={pageVariants} transition={{ duration: 0.2 }}>
+                    {renderActiveView()}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </main>
+          </div>
+          <Toaster position="top-right" richColors closeButton />
+        </TooltipProvider>
+      </DeviceProvider>
     </ThemeProvider>
   );
 }
