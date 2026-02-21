@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "@/styles/global.css";
 import { LayoutDashboard, Box, FolderOpen, Terminal, Settings, Activity, TerminalSquare, LineChart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -71,7 +71,15 @@ export function MainLayout() {
   const [shellHistory, setShellHistory] = useState<HistoryEntry[]>([]);
   const [shellCommandHistory, setShellCommandHistory] = useState<string[]>([]);
 
-  const renderActiveView = () => {
+  const handleToggleCollapse = useCallback(() => {
+    setIsCollapsed((prev) => !prev);
+  }, []);
+
+  const handleSelectView = useCallback((id: string) => {
+    setActiveView(id as ViewType);
+  }, []);
+
+  const renderedView = useMemo(() => {
     switch (activeView) {
       case VIEWS.DASHBOARD:
         return <ViewDashboard activeView={activeView} />;
@@ -94,7 +102,7 @@ export function MainLayout() {
       default:
         return <ViewDashboard activeView={activeView} />;
     }
-  };
+  }, [activeView, shellHistory, shellCommandHistory]);
 
   useEffect(() => {
     let animationFrame: number;
@@ -126,13 +134,13 @@ export function MainLayout() {
         <TooltipProvider delayDuration={0}>
           <LoadingOverlay isLoading={isLoading} progress={progress} />
           <div className={cn("relative flex h-screen bg-background text-foreground overflow-hidden", isLoading ? "opacity-0" : "opacity-100 transition-opacity duration-500 ease-in-out")}>
-            <AppSidebar navItems={NAV_ITEMS} activeView={activeView} isCollapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed((prev) => !prev)} onSelectView={(id) => setActiveView(id as ViewType)} />
+            <AppSidebar navItems={NAV_ITEMS} activeView={activeView} isCollapsed={isCollapsed} onToggleCollapse={handleToggleCollapse} onSelectView={handleSelectView} />
 
             <main className="flex-1 overflow-auto custom-scroll perf-scroll">
               <div className="min-h-full p-6">
                 <AnimatePresence mode="wait">
                   <motion.div key={activeView} initial="hidden" animate="visible" exit="exit" variants={pageVariants} transition={{ duration: 0.2 }}>
-                    {renderActiveView()}
+                    {renderedView}
                   </motion.div>
                 </AnimatePresence>
               </div>

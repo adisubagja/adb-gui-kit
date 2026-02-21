@@ -23,11 +23,11 @@ export function AppSidebar({ navItems, activeView, isCollapsed, onToggleCollapse
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: isCollapsed ? 80 : 280 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="relative flex flex-col border-r border-border/50 bg-background"
+    <aside
+      className={cn(
+        "relative flex flex-col border-r border-border/50 bg-background transition-[width] duration-300 ease-in-out",
+        isCollapsed ? "w-[80px]" : "w-[280px]"
+      )}
     >
       <div className={cn("relative flex h-20 items-center gap-3 border-b border-border/50", isCollapsed ? "justify-center px-0" : "justify-between pl-6 pr-4")}>
         <motion.div className={cn("flex items-center gap-3", !isCollapsed && "w-full")} animate={{ justifyContent: isCollapsed ? "center" : "flex-start" }}>
@@ -111,6 +111,6 @@ export function AppSidebar({ navItems, activeView, isCollapsed, onToggleCollapse
         </TooltipTrigger>
         <TooltipContent side="right">{isCollapsed ? "Expand" : "Collapse"}</TooltipContent>
       </Tooltip>
-    </motion.aside>
+    </aside>
   );
 }
