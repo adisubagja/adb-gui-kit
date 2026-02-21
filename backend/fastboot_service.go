@@ -63,3 +63,15 @@ func (a *App) RunFastbootHostCommand(args string) (string, error) {
 
 	return output, nil
 }
+
+func (a *App) FlashRomFolder(serial string, folderPath string, plan FlashPlan) error {
+	return nil
+}
+
+func (a *App) GetFastbootSlot(serial string) (string, error) {
+	return "a", nil
+}
+
+func (a *App) SetFastbootSlot(serial string, slot string) error {
+	return nil
+}

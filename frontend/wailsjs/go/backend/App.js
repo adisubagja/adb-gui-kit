@@ -18,6 +18,10 @@ export function ConnectWirelessAdb(arg1, arg2) {
   return window['go']['backend']['App']['ConnectWirelessAdb'](arg1, arg2);
 }
 
+export function CreateBugreport(arg1, arg2) {
+  return window['go']['backend']['App']['CreateBugreport'](arg1, arg2);
+}
+
 export function CreateFolder(arg1) {
   return window['go']['backend']['App']['CreateFolder'](arg1);
 }
@@ -58,6 +62,14 @@ export function FlashPartition(arg1, arg2) {
   return window['go']['backend']['App']['FlashPartition'](arg1, arg2);
 }
 
+export function FlashRomFolder(arg1, arg2, arg3) {
+  return window['go']['backend']['App']['FlashRomFolder'](arg1, arg2, arg3);
+}
+
+export function GetCommandHistory(arg1, arg2) {
+  return window['go']['backend']['App']['GetCommandHistory'](arg1, arg2);
+}
+
 export function GetDeviceInfo() {
   return window['go']['backend']['App']['GetDeviceInfo']();
 }
@@ -72,6 +84,14 @@ export function GetDevices() {
 
 export function GetFastbootDevices() {
   return window['go']['backend']['App']['GetFastbootDevices']();
+}
+
+export function GetFastbootSlot(arg1) {
+  return window['go']['backend']['App']['GetFastbootSlot'](arg1);
+}
+
+export function GetPerformanceSnapshot(arg1) {
+  return window['go']['backend']['App']['GetPerformanceSnapshot'](arg1);
 }
 
 export function Greet(arg1) {
@@ -166,8 +186,20 @@ export function SelectZipFile() {
   return window['go']['backend']['App']['SelectZipFile']();
 }
 
+export function SetFastbootSlot(arg1, arg2) {
+  return window['go']['backend']['App']['SetFastbootSlot'](arg1, arg2);
+}
+
 export function SideloadPackage(arg1) {
   return window['go']['backend']['App']['SideloadPackage'](arg1);
+}
+
+export function StartLogcat(arg1, arg2) {
+  return window['go']['backend']['App']['StartLogcat'](arg1, arg2);
+}
+
+export function StopLogcat(arg1) {
+  return window['go']['backend']['App']['StopLogcat'](arg1);
 }
 
 export function UninstallMultiplePackages(arg1) {

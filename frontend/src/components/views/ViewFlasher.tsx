@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { WipeData, FlashPartition, SelectImageFile, GetFastbootDevices, SelectZipFile, SideloadPackage } from "../../../wailsjs/go/backend/App";
+import { WipeData, FlashPartition, SelectImageFile, GetFastbootDevices, SelectZipFile, SideloadPackage, FlashRomFolder, GetFastbootSlot, SetFastbootSlot } from "../../../wailsjs/go/backend/App";
 import { backend } from "../../../wailsjs/go/models";
 
 import { toast } from "sonner";

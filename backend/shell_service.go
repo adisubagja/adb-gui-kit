@@ -43,3 +43,15 @@ func (a *App) SideloadPackage(filePath string) (string, error) {
 
 	return output, nil
 }
+
+func (a *App) StartLogcat(serial string, filters string) error {
+	return nil
+}
+
+func (a *App) StopLogcat(streamId string) error {
+	return nil
+}
+
+func (a *App) CreateBugreport(serial string, outputPath string) error {
+	return nil
+}

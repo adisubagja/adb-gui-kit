@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { RunShellCommand, RunAdbHostCommand, RunFastbootHostCommand } from "../../../wailsjs/go/backend/App";
+import { RunShellCommand, RunAdbHostCommand, RunFastbootHostCommand, StartLogcat, StopLogcat, GetCommandHistory } from "../../../wailsjs/go/backend/App";
 
 import type { HistoryEntry } from "../MainLayout";
 import { ShellTerminalCard } from "@/components/shell/ShellTerminalCard";

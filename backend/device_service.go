@@ -283,3 +283,7 @@ func (a *App) Reboot(mode string) error {
 		return fmt.Errorf("no connected device detected in adb or fastboot mode")
 	}
 }
+
+func (a *App) GetPerformanceSnapshot(serial string) (PerformanceSnapshot, error) {
+	return PerformanceSnapshot{}, nil
+}

@@ -23,8 +23,8 @@ type DeviceInfo struct {
 	AndroidVersion string
 	BuildNumber    string
 	BatteryLevel   string
-	Serial         string 
-	IPAddress      string 
+	Serial         string
+	IPAddress      string
 	RootStatus     string
 	Codename       string
 	RamTotal       string
@@ -46,11 +46,27 @@ type PackageInfo struct {
 	IsEnabled   bool
 }
 
+type FlashPlan struct {
+	Steps []FlashStep `json:"steps"`
+}
+
+type FlashStep struct {
+	Partition string `json:"partition"`
+	ImageFile string `json:"imageFile"`
+}
+
+type PerformanceSnapshot struct {
+	CPUUsage     float64 `json:"cpuUsage"`
+	RAMUsage     float64 `json:"ramUsage"`
+	NetworkRxSec float64 `json:"networkRxSec"`
+	NetworkTxSec float64 `json:"networkTxSec"`
+}
+
 type App struct {
 	ctx         context.Context
 	binaryCache map[string]string
 	cacheMutex  sync.RWMutex
-	
+
 	currentCancel context.CancelFunc
 	opMutex       sync.Mutex
 }
