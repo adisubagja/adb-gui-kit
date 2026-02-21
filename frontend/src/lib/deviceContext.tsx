@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { GetDevices, GetFastbootDevices } from "../../wailsjs/go/backend/App";
+import { GetDevices, GetFastbootDevices, SetActiveSerial } from "../../wailsjs/go/backend/App";
 import { backend } from "../../wailsjs/go/models";
 
 interface DeviceContextType {
@@ -54,6 +54,18 @@ export function DeviceProvider({ children }: { children: React.ReactNode }) {
     refreshDevices();
     const interval = setInterval(refreshDevices, 5000);
     return () => clearInterval(interval);
+  }, [activeSerial]);
+
+  useEffect(() => {
+    const syncActiveSerial = async () => {
+      try {
+        await SetActiveSerial(activeSerial ?? "");
+      } catch (error) {
+        console.error("Failed to sync active serial:", error);
+      }
+    };
+
+    syncActiveSerial();
   }, [activeSerial]);
 
   return (

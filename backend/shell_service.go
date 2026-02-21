@@ -42,15 +42,10 @@ func (a *App) RunAdbHostCommand(args string) (string, error) {
 }
 
 func (a *App) SideloadPackage(filePath string) (string, error) {
-
-	output, err := a.runCommand("adb", "sideload", filePath)
+	output, err := a.runAdbCommand("sideload", filePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to sideload package: %w. Output: %s", err, output)
 	}
 
 	return output, nil
-}
-
-func (a *App) CreateBugreport(serial string, outputPath string) error {
-	return nil
 }

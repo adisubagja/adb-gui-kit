@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -67,6 +68,9 @@ type App struct {
 	binaryCache map[string]string
 	cacheMutex  sync.RWMutex
 
+	activeSerial      string
+	activeSerialMutex sync.RWMutex
+
 	currentCancel context.CancelFunc
 	opMutex       sync.Mutex
 
@@ -99,4 +103,20 @@ func (a *App) CancelOperation() string {
 		return "Operation cancelled."
 	}
 	return "No active operation to cancel."
+}
+
+func (a *App) SetActiveSerial(serial string) error {
+	trimmed := strings.TrimSpace(serial)
+
+	a.activeSerialMutex.Lock()
+	a.activeSerial = trimmed
+	a.activeSerialMutex.Unlock()
+
+	return nil
+}
+
+func (a *App) getActiveSerial() string {
+	a.activeSerialMutex.RLock()
+	defer a.activeSerialMutex.RUnlock()
+	return a.activeSerial
 }

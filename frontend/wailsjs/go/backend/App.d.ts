@@ -96,6 +96,8 @@ export function SelectSaveFile(arg1:string):Promise<string>;
 
 export function SelectZipFile():Promise<string>;
 
+export function SetActiveSerial(arg1:string):Promise<void>;
+
 export function SetFastbootSlot(arg1:string,arg2:string):Promise<void>;
 
 export function SideloadPackage(arg1:string):Promise<string>;

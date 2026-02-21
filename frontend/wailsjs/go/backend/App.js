@@ -190,6 +190,10 @@ export function SelectZipFile() {
   return window['go']['backend']['App']['SelectZipFile']();
 }
 
+export function SetActiveSerial(arg1) {
+  return window['go']['backend']['App']['SetActiveSerial'](arg1);
+}
+
 export function SetFastbootSlot(arg1, arg2) {
   return window['go']['backend']['App']['SetFastbootSlot'](arg1, arg2);
 }
