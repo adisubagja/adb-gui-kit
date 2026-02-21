@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import "@/styles/global.css";
-import { LayoutDashboard, Box, FolderOpen, Terminal, Settings, Activity } from "lucide-react";
+import { LayoutDashboard, Box, FolderOpen, Terminal, Settings, Activity, TerminalSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +13,7 @@ import { ViewFileExplorer } from "./views/ViewFileExplorer";
 import { ViewFlasher } from "./views/ViewFlasher";
 import { ViewUtilities } from "./views/ViewUtilities";
 import { ViewLogcat } from "./views/ViewLogcat";
+import { ViewCommandLogs } from "./views/ViewCommandLogs";
 import { Toaster } from "@/components/ui/sonner";
 
 import { ThemeProvider } from "./ThemeProvider";
@@ -28,6 +29,7 @@ const VIEWS = {
   UTILS: "utils",
   LOGCAT: "logcat",
   SHELL: "shell",
+  LOGS: "logs",
 } as const;
 
 type ViewType = (typeof VIEWS)[keyof typeof VIEWS];
@@ -53,6 +55,7 @@ const NAV_ITEMS = [
   { id: VIEWS.LOGCAT, icon: Activity, label: "Logcat" },
   { id: VIEWS.UTILS, icon: Settings, label: "Utility" },
   { id: VIEWS.SHELL, icon: Terminal, label: "Terminal" },
+  { id: VIEWS.LOGS, icon: TerminalSquare, label: "Audit Logs" },
 ];
 
 export function MainLayout() {
@@ -79,6 +82,8 @@ export function MainLayout() {
         return <ViewLogcat activeView={activeView} />;
       case VIEWS.SHELL:
         return <ViewShell activeView={activeView} history={shellHistory} setHistory={setShellHistory} commandHistory={shellCommandHistory} setCommandHistory={setShellCommandHistory} />;
+      case VIEWS.LOGS:
+        return <ViewCommandLogs activeView={activeView} />;
       default:
         return <ViewDashboard activeView={activeView} />;
     }
