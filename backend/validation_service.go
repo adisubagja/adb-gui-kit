@@ -2,34 +2,34 @@ package backend
 
 import (
 	"fmt"
-	"strings"
 	"path/filepath"
+	"strings"
 )
 
 var allowedFlashPartitions = map[string]bool{
-	"boot":         true,
-	"boot_a":       true,
-	"boot_b":       true,
-	"init_boot":    true,
-	"init_boot_a":  true,
-	"init_boot_b":  true,
-	"vendor_boot":  true,
+	"boot":          true,
+	"boot_a":        true,
+	"boot_b":        true,
+	"init_boot":     true,
+	"init_boot_a":   true,
+	"init_boot_b":   true,
+	"vendor_boot":   true,
 	"vendor_boot_a": true,
 	"vendor_boot_b": true,
-	"recovery":     true,
-	"recovery_a":   true,
-	"recovery_b":   true,
-	"system":       true,
-	"system_ext":   true,
-	"vendor":       true,
-	"product":      true,
-	"odm":          true,
-	"vbmeta":       true,
+	"recovery":      true,
+	"recovery_a":    true,
+	"recovery_b":    true,
+	"system":        true,
+	"system_ext":    true,
+	"vendor":        true,
+	"product":       true,
+	"odm":           true,
+	"vbmeta":        true,
 	"vbmeta_system": true,
 	"vbmeta_vendor": true,
-	"dtbo":         true,
-	"super":        true,
-	"userdata":     true,
+	"dtbo":          true,
+	"super":         true,
+	"userdata":      true,
 }
 
 var allowedFlashExtensions = map[string]bool{
@@ -85,5 +85,22 @@ func (a *App) validateHostCommand(args []string) error {
 			}
 		}
 	}
+	return nil
+}
+
+func (a *App) validateRemotePath(path string) error {
+	trimmedPath := strings.TrimSpace(path)
+	if trimmedPath == "" {
+		return fmt.Errorf("security error: remote path cannot be empty")
+	}
+
+	if strings.Contains(trimmedPath, "\x00") {
+		return fmt.Errorf("security error: remote path contains null byte")
+	}
+
+	if strings.ContainsAny(trimmedPath, "\n\r") {
+		return fmt.Errorf("security error: remote path contains newline characters")
+	}
+
 	return nil
 }

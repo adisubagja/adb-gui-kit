@@ -8,6 +8,10 @@ import (
 	"time"
 )
 
+func quoteShellArg(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\"'\"'") + "'"
+}
+
 func (a *App) ListFiles(path string) ([]FileEntry, error) {
 
 	// List files uses default timeout (60s) which is sufficient
@@ -162,7 +166,11 @@ func (a *App) PullFile(remotePath string, localPath string) (string, error) {
 }
 
 func (a *App) CreateFolder(fullPath string) (string, error) {
-	command := fmt.Sprintf("mkdir -p '%s'", fullPath)
+	if err := a.validateRemotePath(fullPath); err != nil {
+		return "", err
+	}
+
+	command := fmt.Sprintf("mkdir -p %s", quoteShellArg(fullPath))
 
 	output, err := a.runShellCommand(command)
 	if err != nil {
@@ -173,7 +181,11 @@ func (a *App) CreateFolder(fullPath string) (string, error) {
 }
 
 func (a *App) DeleteFile(fullPath string) (string, error) {
-	command := fmt.Sprintf("rm -rf '%s'", fullPath)
+	if err := a.validateRemotePath(fullPath); err != nil {
+		return "", err
+	}
+
+	command := fmt.Sprintf("rm -rf %s", quoteShellArg(fullPath))
 
 	output, err := a.runShellCommand(command)
 	if err != nil {
@@ -184,7 +196,15 @@ func (a *App) DeleteFile(fullPath string) (string, error) {
 }
 
 func (a *App) RenameFile(oldPath string, newPath string) (string, error) {
-	command := fmt.Sprintf("mv '%s' '%s'", oldPath, newPath)
+	if err := a.validateRemotePath(oldPath); err != nil {
+		return "", err
+	}
+
+	if err := a.validateRemotePath(newPath); err != nil {
+		return "", err
+	}
+
+	command := fmt.Sprintf("mv %s %s", quoteShellArg(oldPath), quoteShellArg(newPath))
 
 	output, err := a.runShellCommand(command)
 	if err != nil {
