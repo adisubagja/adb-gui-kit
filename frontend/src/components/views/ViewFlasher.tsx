@@ -3,6 +3,7 @@ import { WipeData, FlashPartition, SelectImageFile, GetFastbootDevices, SelectZi
 import { backend } from "../../../wailsjs/go/models";
 
 import { toast } from "sonner";
+import { useDevice } from "@/lib/deviceContext";
 import { FastbootDevicesCard } from "@/components/flasher/FastbootDevicesCard";
 import { FlashPartitionCard } from "@/components/flasher/FlashPartitionCard";
 import { RecoveryActionsCard } from "@/components/flasher/RecoveryActionsCard";
@@ -39,6 +40,7 @@ const areDeviceListsEqual = (a: Device[], b: Device[]): boolean => {
 };
 
 export function ViewFlasher({ activeView }: { activeView: string }) {
+  const { activeSerial } = useDevice();
   const [partition, setPartition] = useState("");
   const [filePath, setFilePath] = useState("");
   const [sideloadFilePath, setSideloadFilePath] = useState("");
@@ -263,13 +265,13 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
 
   const handleBatchFlash = async () => {
     if (!flashPlan || !flashPlan.steps || flashPlan.steps.length === 0) return;
-    if (fastbootDevices.length === 0) {
+    if (!selectedFastbootSerial) {
       toast.error("No fastboot device connected.");
       return;
     }
 
     setIsBatchFlashing(true);
-    const serial = fastbootDevices[0].Serial;
+    const serial = selectedFastbootSerial;
     const toastId = toast.loading(`Starting batch flash sequence (${flashPlan.steps.length} partitions)...`);
 
     try {
@@ -284,11 +286,10 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   };
 
   const handleRefreshSlot = async () => {
-    if (fastbootDevices.length === 0) return;
+    if (!selectedFastbootSerial) return;
     setIsChangingSlot(true);
     try {
-      const serial = fastbootDevices[0].Serial;
-      const slot = await GetFastbootSlot(serial);
+      const slot = await GetFastbootSlot(selectedFastbootSerial);
       setCurrentSlot(slot);
     } catch (error) {
       console.error("Failed to get slot", error);
@@ -300,12 +301,11 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
   };
 
   const handleSetSlot = async (slot: string) => {
-    if (fastbootDevices.length === 0) return;
+    if (!selectedFastbootSerial) return;
     setIsChangingSlot(true);
     const toastId = toast.loading(`Setting active slot to ${slot}...`);
     try {
-      const serial = fastbootDevices[0].Serial;
-      await SetFastbootSlot(serial, slot);
+      await SetFastbootSlot(selectedFastbootSerial, slot);
       setCurrentSlot(slot);
       toast.success("Slot Changed", { description: `Active slot set to ${slot}`, id: toastId });
     } catch (error) {
@@ -318,6 +318,10 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
 
   const hasSideloadDevice = fastbootDevices.some(d => d.Status === "sideload" || d.Status === "recovery");
   const hasFastbootDevice = fastbootDevices.some(d => d.Status === "fastboot");
+  const selectedFastbootSerial =
+    activeSerial && fastbootDevices.some((device) => device.Serial === activeSerial)
+      ? activeSerial
+      : (fastbootDevices[0]?.Serial ?? "");
 
   return (
     <div className="flex flex-col gap-6">
