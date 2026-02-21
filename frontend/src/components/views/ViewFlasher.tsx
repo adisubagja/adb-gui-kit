@@ -316,6 +316,9 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
     }
   };
 
+  const hasSideloadDevice = fastbootDevices.some(d => d.Status === "sideload" || d.Status === "recovery");
+  const hasFastbootDevice = fastbootDevices.some(d => d.Status === "fastboot");
+
   return (
     <div className="flex flex-col gap-6">
       <FastbootDevicesCard devices={fastbootDevices} isRefreshing={isRefreshingFastboot} error={fastbootError} onRefresh={() => refreshFastbootDevices()} />
@@ -325,10 +328,10 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onRefreshSlot={handleRefreshSlot} 
         onSetSlot={handleSetSlot} 
         isChangingSlot={isChangingSlot} 
-        canManage={fastbootDevices.length > 0} 
+        canManage={hasFastbootDevice} 
       />
 
-      <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={fastbootDevices.length > 0} />
+      <FlashPartitionCard partition={partition} onPartitionChange={setPartition} filePath={filePath} onSelectFile={handleSelectFile} onFlash={handleFlash} isFlashing={isFlashing} canFlash={hasFastbootDevice} />
 
       <FlashRomFolderCard 
         folderPath={romFolderPath}
@@ -338,7 +341,7 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onFlash={handleBatchFlash}
         isScanning={isScanningFolder}
         isFlashing={isBatchFlashing}
-        canFlash={fastbootDevices.length > 0}
+        canFlash={hasFastbootDevice}
       />
 
       <RecoveryActionsCard
@@ -348,7 +351,8 @@ export function ViewFlasher({ activeView }: { activeView: string }) {
         onSideload={handleSideload}
         isWiping={isWiping}
         onWipe={handleWipe}
-        canWipe={fastbootDevices.length > 0}
+        canWipe={hasFastbootDevice}
+        isRecoveryMode={hasSideloadDevice}
       />
     </div>
   );

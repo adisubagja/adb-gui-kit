@@ -34,24 +34,52 @@ func (a *App) FlashPartition(partition string, filePath string) error {
 }
 
 func (a *App) GetFastbootDevices() ([]Device, error) {
-	output, err := a.runCommand("fastboot", "devices")
-	if err != nil {
-		if output == "" {
-			return []Device{}, nil
+	// 1. Get fastboot devices
+	fastbootOutput, err := a.runCommand("fastboot", "devices")
+	var devices []Device
+
+	if err == nil && fastbootOutput != "" {
+		lines := strings.Split(fastbootOutput, "\n")
+		for _, line := range lines {
+			parts := strings.Fields(line)
+			// check specifically for fastboot or recovery/sideload if fastboot supports it
+			if len(parts) >= 2 {
+				devices = append(devices, Device{
+					Serial: parts[0],
+					Status: parts[1],
+				})
+			}
 		}
-		return nil, err
 	}
 
-	var devices []Device
-	lines := strings.Split(output, "\n")
-
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		if len(parts) >= 2 && parts[1] == "fastboot" {
-			devices = append(devices, Device{
-				Serial: parts[0],
-				Status: parts[1],
-			})
+	// 2. Also check adb devices for 'sideload' or 'recovery' state
+	adbOutput, err := a.runCommand("adb", "devices")
+	if err == nil && adbOutput != "" {
+		lines := strings.Split(adbOutput, "\n")
+		for i, line := range lines {
+			if i == 0 || strings.TrimSpace(line) == "" {
+				continue // skip header "List of devices attached"
+			}
+			parts := strings.Fields(line)
+			if len(parts) >= 2 {
+				status := parts[1]
+				if status == "sideload" || status == "recovery" {
+					// Check if we already have it to prevent duplicates (unlikely between adb and fastboot, but safe)
+					alreadyExists := false
+					for _, d := range devices {
+						if d.Serial == parts[0] {
+							alreadyExists = true
+							break
+						}
+					}
+					if !alreadyExists {
+						devices = append(devices, Device{
+							Serial: parts[0],
+							Status: status,
+						})
+					}
+				}
+			}
 		}
 	}
 
