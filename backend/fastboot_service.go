@@ -14,6 +14,10 @@ func (a *App) WipeData() error {
 }
 
 func (a *App) FlashPartition(partition string, filePath string) error {
+	return a.flashPartitionForSerial("", partition, filePath)
+}
+
+func (a *App) flashPartitionForSerial(serial string, partition string, filePath string) error {
 	if partition == "" || filePath == "" {
 		return fmt.Errorf("partition and file path cannot be empty")
 	}
@@ -26,7 +30,12 @@ func (a *App) FlashPartition(partition string, filePath string) error {
 		return err
 	}
 
-	output, err := a.runCommand("fastboot", "flash", partition, filePath)
+	args := []string{"flash", partition, filePath}
+	if strings.TrimSpace(serial) != "" {
+		args = append([]string{"-s", strings.TrimSpace(serial)}, args...)
+	}
+
+	output, err := a.runCommand("fastboot", args...)
 	if err != nil {
 		return fmt.Errorf("failed to run fastboot flash: %w. Output: %s", err, output)
 	}
@@ -113,7 +122,7 @@ func (a *App) FlashRomFolder(serial string, folderPath string, plan FlashPlan) e
 	for i, step := range plan.Steps {
 		a.logCommand("fastboot", []string{"-s", serial, "flash", step.Partition, step.ImageFile}, 0, nil, fmt.Sprintf("Starting step %d: Flashing %s", i+1, step.Partition))
 
-		err := a.FlashPartition(step.Partition, step.ImageFile)
+		err := a.flashPartitionForSerial(serial, step.Partition, step.ImageFile)
 		if err != nil {
 			return fmt.Errorf("failed at step %d (partition %s): %w", i+1, step.Partition, err)
 		}
