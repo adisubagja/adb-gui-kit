@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { EventsOn, EventsOff } from "../../../../wailsjs/runtime/runtime";
-import { StartLogcat, StopLogcat, GetDevices } from "../../../../wailsjs/go/backend/App";
+import { EventsOn, EventsOff } from "../../../wailsjs/runtime/runtime";
+import { StartLogcat, StopLogcat, GetDevices } from "../../../wailsjs/go/backend/App";
 import { LogcatTerminalCard } from "@/components/logcat/LogcatTerminalCard";
 import { toast } from "sonner";
-import { backend } from "../../../../wailsjs/go/models";
+import { backend } from "../../../wailsjs/go/models";
 
 // Use a global buffer to prevent overwhelming React state if lines come too fast
 let logBuffer: { id: string, serial: string, line: string, type: "stdout" | "stderr" }[] = [];

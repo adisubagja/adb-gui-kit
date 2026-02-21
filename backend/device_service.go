@@ -284,6 +284,3 @@ func (a *App) Reboot(mode string) error {
 	}
 }
 
-func (a *App) GetPerformanceSnapshot(serial string) (PerformanceSnapshot, error) {
-	return PerformanceSnapshot{}, nil
-}

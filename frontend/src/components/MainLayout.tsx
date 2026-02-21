@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import "@/styles/global.css";
-import { LayoutDashboard, Box, FolderOpen, Terminal, Settings, Activity, TerminalSquare } from "lucide-react";
+import { LayoutDashboard, Box, FolderOpen, Terminal, Settings, Activity, TerminalSquare, LineChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,7 @@ import { ViewFlasher } from "./views/ViewFlasher";
 import { ViewUtilities } from "./views/ViewUtilities";
 import { ViewLogcat } from "./views/ViewLogcat";
 import { ViewCommandLogs } from "./views/ViewCommandLogs";
+import { ViewMonitor } from "./views/ViewMonitor";
 import { Toaster } from "@/components/ui/sonner";
 
 import { ThemeProvider } from "./ThemeProvider";
@@ -30,6 +31,7 @@ const VIEWS = {
   FLASHER: "flasher",
   UTILS: "utils",
   LOGCAT: "logcat",
+  MONITOR: "monitor",
   SHELL: "shell",
   LOGS: "logs",
 } as const;
@@ -55,6 +57,7 @@ const NAV_ITEMS = [
   { id: VIEWS.FILES, icon: FolderOpen, label: "File" },
   { id: VIEWS.FLASHER, icon: Terminal, label: "Flasher" },
   { id: VIEWS.LOGCAT, icon: Activity, label: "Logcat" },
+  { id: VIEWS.MONITOR, icon: LineChart, label: "Monitor" },
   { id: VIEWS.UTILS, icon: Settings, label: "Utility" },
   { id: VIEWS.SHELL, icon: Terminal, label: "Terminal" },
   { id: VIEWS.LOGS, icon: TerminalSquare, label: "Audit Logs" },
@@ -82,6 +85,8 @@ export function MainLayout() {
         return <ViewUtilities activeView={activeView} />;
       case VIEWS.LOGCAT:
         return <ViewLogcat activeView={activeView} />;
+      case VIEWS.MONITOR:
+        return <ViewMonitor activeView={activeView} />;
       case VIEWS.SHELL:
         return <ViewShell activeView={activeView} history={shellHistory} setHistory={setShellHistory} commandHistory={shellCommandHistory} setCommandHistory={setShellCommandHistory} />;
       case VIEWS.LOGS:
