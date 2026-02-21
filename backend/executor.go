@@ -140,7 +140,7 @@ func (a *App) runCommandRaw(name string, args ...string) (string, error) {
 func (a *App) runShellCommand(shellCommand string) (string, error) {
 	// Security: simplistic check to prevent completely reckless command injection
 	// Ideally, shell commands should be avoided in favor of direct args, but adb shell requires it often.
-	if strings.ContainsAny(shellCommand, "&|;") {
+	if strings.ContainsAny(shellCommand, "&|;><$`") {
 		return "", fmt.Errorf("illegal characters in command")
 	}
 

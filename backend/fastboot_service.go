@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 )
+
 func (a *App) WipeData() error {
 	output, err := a.runCommand("fastboot", "-w")
 	if err != nil {
@@ -15,6 +16,14 @@ func (a *App) WipeData() error {
 func (a *App) FlashPartition(partition string, filePath string) error {
 	if partition == "" || filePath == "" {
 		return fmt.Errorf("partition and file path cannot be empty")
+	}
+
+	if err := a.validateFlashPartition(partition); err != nil {
+		return err
+	}
+
+	if err := a.validateFlashFile(filePath); err != nil {
+		return err
 	}
 
 	output, err := a.runCommand("fastboot", "flash", partition, filePath)
@@ -55,6 +64,10 @@ func (a *App) RunFastbootHostCommand(args string) (string, error) {
 	}
 
 	argSlice := strings.Fields(args)
+
+	if err := a.validateHostCommand(argSlice); err != nil {
+		return "", err
+	}
 
 	output, err := a.runCommand("fastboot", argSlice...)
 	if err != nil {
