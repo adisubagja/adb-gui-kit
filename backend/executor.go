@@ -36,7 +36,7 @@ func (a *App) getBinaryPath(name string) (string, error) {
 	exePath, err := os.Executable()
 	if err == nil {
 		installDir := filepath.Dir(exePath)
-		candidates = append(candidates, 
+		candidates = append(candidates,
 			filepath.Join(installDir, "bin", platformDir, name+extension),
 			filepath.Join(installDir, "bin", name+extension),
 		)
@@ -84,12 +84,17 @@ func (a *App) runCommandContext(ctx context.Context, name string, args ...string
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 
+	start := time.Now()
 	err = cmd.Run()
+	duration := time.Since(start)
+
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
+			a.logCommand(name, args, duration, fmt.Errorf("timeout"), "")
 			return "", fmt.Errorf("command timed out after %s", DefaultCommandTimeout)
 		}
 		if ctx.Err() == context.Canceled {
+			a.logCommand(name, args, duration, fmt.Errorf("cancelled"), "")
 			return "", fmt.Errorf("command cancelled by user")
 		}
 
@@ -97,7 +102,9 @@ func (a *App) runCommandContext(ctx context.Context, name string, args ...string
 		if errOutput == "" {
 			errOutput = err.Error()
 		}
-		
+
+		a.logCommand(name, args, duration, fmt.Errorf("%s", errOutput), errOutput)
+
 		if strings.Contains(errOutput, "device offline") {
 			return "", fmt.Errorf("device is offline. Try reconnecting USB")
 		}
@@ -108,7 +115,9 @@ func (a *App) runCommandContext(ctx context.Context, name string, args ...string
 		return "", fmt.Errorf("%s", errOutput)
 	}
 
-	return strings.TrimSpace(out.String()), nil
+	outStr := strings.TrimSpace(out.String())
+	a.logCommand(name, args, duration, nil, outStr)
+	return outStr, nil
 }
 
 func (a *App) runCommand(name string, args ...string) (string, error) {
@@ -152,19 +161,27 @@ func (a *App) runShellCommand(shellCommand string) (string, error) {
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 
+	start := time.Now()
 	err = cmd.Run()
+	duration := time.Since(start)
+
 	if err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
+			a.logCommand("adb", []string{"shell", shellCommand}, duration, fmt.Errorf("timeout"), "")
 			return "", fmt.Errorf("shell command timed out")
 		}
 		errOutput := strings.TrimSpace(stderr.String())
 		if errOutput == "" {
 			errOutput = err.Error()
 		}
+
+		a.logCommand("adb", []string{"shell", shellCommand}, duration, fmt.Errorf("%s", errOutput), errOutput)
 		return "", fmt.Errorf("shell error: %s", errOutput)
 	}
 
-	return strings.TrimSpace(out.String()), nil
+	outStr := strings.TrimSpace(out.String())
+	a.logCommand("adb", []string{"shell", shellCommand}, duration, nil, outStr)
+	return outStr, nil
 }
 
 func (a *App) CheckSystemRequirements() (string, error) {

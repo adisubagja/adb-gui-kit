@@ -69,11 +69,15 @@ type App struct {
 
 	currentCancel context.CancelFunc
 	opMutex       sync.Mutex
+
+	commandLogs     []CommandLogEntry
+	commandLogMutex sync.RWMutex
 }
 
 func NewApp() *App {
 	return &App{
 		binaryCache: make(map[string]string),
+		commandLogs: make([]CommandLogEntry, 0),
 	}
 }
 
