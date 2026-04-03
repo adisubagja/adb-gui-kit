@@ -1,110 +1,120 @@
 # ADBKit
 
-A simple, modern GUI for ADB and Fastboot.
-Built with **Wails** (Go + React) for speed, lightweight resource usage, and native performance.
+A simple, modern GUI for ADB and Fastboot — built with **Wails** (Go + React) for speed, lightweight resource usage, and native performance.
 
 ---
 
 ## Features
 
-### **Dashboard**
+**Dashboard & Devices**
+- Unified device list with editable nicknames
+- Global selected device context synced across modules
+- Rich device info: battery, storage, RAM, root status, connection state
+- Wireless ADB toggle and pairing via IP/Port
 
-- **Unified Device List**: View all connected devices and emulators with editable nicknames.
-- **Rich Device Info**: Real-time battery, storage, RAM, and root status.
-- **Wireless ADB**: Toggle wireless debugging and standard pairing via IP/Port.
+**Device Monitoring**
+- Live CPU, RAM, and network usage tracking
+- In-app monitoring without switching to external tools
 
-### **App Manager**
+**App Manager**
+- Virtualized lists for smooth handling of thousands of packages
+- Batch install, uninstall, enable, and disable
+- Install local APKs or pull APKs from device
+- Filter by User/System apps, sort by name or state
 
-- **Performance**: Virtualized lists for handling thousands of packages smoothly.
-- **Batch Operations**: Install, Uninstall, Enable, and Disable multiple apps at once.
-- **APK Management**: Install local APKs or pull installed APKs from device.
-- **Analysis**: Filter by User/System apps and sort by name/state.
+**File Explorer**
+- Push, Pull, Rename, Delete, and Create Folders
+- Unlimited timeout for large file transfers
+- Retry support and clear batch result reporting
+- Concurrent I/O with virtualized directory rendering
 
-### **File Explorer**
+**Logcat & Observability**
+- Real-time Logcat streaming with filter support
+- Internal command log history across modules
 
-- **Optimized Transfer**: **Unlimited timeout** support for large file transfers (100GB+).
-- **Concurrent I/O**: Fast listing and operation execution.
-- **Full Control**: Push, Pull, Rename, Delete, and Create Folders.
-- **Virtualization**: Efficient rendering of large directory structures.
+**Fastboot & Flashing**
+- Direct `adb` and `fastboot` shell access
+- One-click reboot to System, Recovery, or Bootloader
+- Flash images, ZIPs, and folder-based image sets
+- Slot A/B management and targeted partition flashing
 
-### **Reliability & Safety**
+**Reliability & Safety**
+- Strict guards for destructive actions
+- Validation for flash flows and command execution
+- Path sanitization for shell-based file operations
+- Clean resource handling for long-running streams
+- Modular, service-based backend architecture
 
-- **Smart Timeouts**: Short timeouts for quick commands, unlimited duration for large transfers.
-- **User Cancellation**: Cancel any long-running operation (Install, Push, Pull) instantly.
-- **Modular Backend**: Service-based architecture ensures stability and easier maintenance.
-
-### **Terminal & Utilities**
-
-- **Universal Shell**: Built-in terminal for direct `adb` or `fastboot` commands.
-- **One-Click Actions**: Reboot to System, Recovery, or Bootloader.
-- **Flasher**: Flash images/ZIPs with validation.
+**Packaging & Distribution**
+- Windows and Linux releases bundle `adb` and `fastboot`
+- Ready-to-use installer and Linux packages
 
 ---
 
 ## Screenshots
 
-- About Screenshots [see here](screenshots/README.md)
+[See here](screenshots/README.md)
 
 ---
 
 ## Installation
 
-1.  Go to the **[Releases](https://github.com/drenzzz/adb-gui-kit/releases)** page.
-2.  Download the latest release for your OS.
-3.  **For Windows/Linux**: Ensure `platform-tools` (adb, fastboot) are reachable or placed in `bin/`.
-4.  Run the application.
+1. Go to the [Releases](https://github.com/drenzzz/adb-gui-kit/releases) page
+2. Download the latest release for your OS
+3. Install or extract the package
+4. Run the application
+
+> **Note:** Official Windows and Linux builds include bundled platform tools. For manual builds, ensure `adb` and `fastboot` are available in your environment.
 
 ---
 
-## Technology Stack
+## Tech Stack
 
-- **Core:** [Wails v2](https://wails.io)
-- **Backend:** Go (Modular Service Architecture)
-- **Frontend:** React (via Astro) + TypeScript
-- **State Management:** Custom React Hooks + Composition
-- **UI:** [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS
+| Layer | Technology |
+|---|---|
+| Core | [Wails v2](https://wails.io) |
+| Backend | Go — Modular Service Architecture |
+| Frontend | React (via Astro) + TypeScript |
+| State | Custom React Hooks + Composition |
+| UI | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS |
 
 ---
 
 ## Building from Source
 
-### Prerequisites
+**Prerequisites:** Go 1.21+, Node.js 18+, pnpm
+```bash
+# Install frontend dependencies
+cd frontend && pnpm install && cd ..
 
-- Go 1.21+
-- Node.js 18+
-- pnpm
+# Development
+wails dev
 
-### Steps
-
-1.  Clone the repository.
-2.  Install frontend dependencies:
-    ```bash
-    cd frontend
-    pnpm install
-    cd ..
-    ```
-3.  Run in development mode (Hot Reload):
-    ```bash
-    wails dev
-    ```
-4.  Build for production:
-    ```bash
-    wails build
-    ```
+# Production build
+wails build
+```
 
 ---
 
 ## Troubleshooting
 
-- **Device Not Found?** Ensure USB Debugging is enabled on your phone and drivers are installed.
-- **Unauthorized?** Check your phone screen to accept the RSA fingerprint prompt.
-- **Linux Users:** If you can't access USB devices, ensure you have the correct `udev` rules set up.
+| Issue | Fix |
+|---|---|
+| Device not found | Enable USB Debugging; install required drivers |
+| Unauthorized | Accept the RSA fingerprint prompt on your device |
+| Wireless ADB not working | Ensure device and computer are on the same network |
+| Linux USB access denied | Configure `udev` rules for your device |
+
+---
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve ADBKit.
-Project Link: https://github.com/Drenzzz/adb-gui-kit
+Contributions are welcome — open an issue or submit a pull request.
+
+**Repo:** https://github.com/Drenzzz/adb-gui-kit
+
+---
 
 ## License
 
-This project is licensed under the MIT License.
+MIT
